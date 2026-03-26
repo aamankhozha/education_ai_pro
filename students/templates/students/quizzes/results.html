@@ -1,0 +1,130 @@
+{% extends "students/base.html" %}
+{% block title %}Нәтижелер{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <div>
+    <h3 class="mb-0">Нәтижелер: {{ quiz.title }}</h3>
+    <div class="text-muted">Тапсырған студенттер және баллдар</div>
+  </div>
+  <a class="btn btn-outline-secondary" href="{% url 'quiz_list_teacher' %}">Артқа</a>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <div class="text-muted">Тапсырғандар</div>
+        <div class="fs-3 fw-bold">{{ subs|length }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <div class="text-muted">Орташа балл</div>
+        <div class="fs-3 fw-bold" id="avgScore">-</div>
+        <div class="text-muted small">Score / Max</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <div class="text-muted">Макс балл</div>
+        <div class="fs-3 fw-bold">{{ subs.0.max_score|default:"-" }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm mb-3">
+  <div class="card-body">
+    <div class="fw-semibold mb-2">График: студенттердің баллдары</div>
+    <canvas id="scoreChart" height="110"></canvas>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    {% if subs %}
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>Студент</th>
+              <th class="text-center">Топ</th>
+              <th class="text-center">Score</th>
+              <th class="text-center">Max</th>
+              <th class="text-center">%</th>
+              <th class="text-end">Тапсырған</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in subs %}
+              <tr>
+                <td class="fw-semibold">{{ s.student.name }}</td>
+                <td class="text-center">{{ s.student.group|default:"-" }}</td>
+                <td class="text-center">{{ s.score }}</td>
+                <td class="text-center">{{ s.max_score }}</td>
+                <td class="text-center">
+                  {% if s.max_score %}
+                    {{ s.score|floatformat:0 }} / {{ s.max_score }} ({{ s.score|divisibleby:s.max_score }})
+                  {% endif %}
+                  {% if s.max_score %}
+                    {% widthratio s.score s.max_score 100 %}%
+                  {% else %}
+                    -
+                  {% endif %}
+                </td>
+                <td class="text-end">{{ s.submitted_at|date:"d.m.Y H:i" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="text-muted">Әзірге ешкім тапсырмады.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const subs = [
+    {% for s in subs %}
+      {
+        name: "{{ s.student.name|escapejs }}",
+        score: {{ s.score|default:0 }},
+        max: {{ s.max_score|default:0 }},
+      },
+    {% endfor %}
+  ];
+
+  const labels = subs.map(x => x.name);
+  const scores = subs.map(x => x.score);
+
+  const totalScore = subs.reduce((a,b)=>a + (b.score||0), 0);
+  const totalMax = subs.reduce((a,b)=>a + (b.max||0), 0);
+
+  const avg = subs.length ? (totalScore / subs.length).toFixed(2) : "-";
+  document.getElementById("avgScore").innerText = avg;
+
+  const ctx = document.getElementById('scoreChart');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{ label: 'Score', data: scores }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: true } },
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+</script>
+{% endblock %}

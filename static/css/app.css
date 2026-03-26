@@ -1,0 +1,16 @@
+:root{
+  --brand:#2b59ff;
+}
+.logo-dot{
+  width:14px;height:14px;border-radius:999px;background:var(--brand);
+  box-shadow:0 0 0 4px rgba(43,89,255,.15);
+}
+.sidebar{
+  min-height:100vh;
+}
+.nav-pills .nav-link.active{
+  background:var(--brand);
+}
+.badge-risk{ background:#ff4d4f; }
+.badge-ok{ background:#52c41a; }
+.kpi-card{ border:0; box-shadow:0 .25rem .75rem rgba(0,0,0,.05); }

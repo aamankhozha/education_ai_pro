@@ -1,0 +1,55 @@
+{% extends "students/base.html" %}
+{% block title %}Менің кабинетім{% endblock %}
+
+{% block content %}
+  <h3 class="mb-1">Менің кабинетім</h3>
+  <div class="text-muted mb-3">Тек өз деректеріңіз көрінеді</div>
+
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="card kpi-card">
+        <div class="card-body">
+          <div class="text-muted">Аты-жөні</div>
+          <div class="fw-bold fs-4">{{ student.name }}</div>
+          <div class="text-muted small">Топ: {{ student.group|default:"-" }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card kpi-card">
+        <div class="card-body">
+          <div class="text-muted">Тәуекел статусы</div>
+          {% if student.risk_status == "Тәуекел" %}
+            <div class="fw-bold fs-4 text-danger">Тәуекел</div>
+          {% else %}
+            <div class="fw-bold fs-4 text-success">Қалыпты</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card kpi-card">
+        <div class="card-body">
+          <div class="text-muted">Болжам</div>
+          <div class="fw-bold fs-4">{{ student.predicted_performance|default:"-" }}</div>
+          <div class="text-muted small">Actual: {{ student.actual_performance|default:"-" }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm mt-3">
+    <div class="card-body">
+      <div class="fw-semibold mb-2">Көрсеткіштер</div>
+      <div class="row g-2">
+        <div class="col-md-3"><div class="p-3 bg-light rounded">Attendance: <b>{{ student.attendance }}</b></div></div>
+        <div class="col-md-3"><div class="p-3 bg-light rounded">Homework: <b>{{ student.homework }}</b></div></div>
+        <div class="col-md-3"><div class="p-3 bg-light rounded">Midterm: <b>{{ student.midterm }}</b></div></div>
+        <div class="col-md-3"><div class="p-3 bg-light rounded">Final: <b>{{ student.final }}</b></div></div>
+      </div>
+      <div class="text-muted small mt-2">Average score: {{ student.average_score }}</div>
+    </div>
+  </div>
+{% endblock %}

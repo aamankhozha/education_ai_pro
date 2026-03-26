@@ -1,0 +1,373 @@
+{% extends "students/base.html" %}
+{% block title %}Аналитика{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+  <div>
+    <h2 class="mb-1">AI Аналитика</h2>
+    <div class="text-muted">Студент прогресі, әлсіз тақырыптар, remedial тиімділігі және ML болжамдары</div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small mb-2">Орташа тест нәтижесі</div>
+        <div class="display-6 fw-bold">{{ avg_test_percent|default:"0" }}%</div>
+        <div class="text-muted small">Барлық тапсырылған тесттердің орташа пайызы</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small mb-2">Орташа remedial improvement</div>
+        <div class="display-6 fw-bold">{{ avg_remedial_gain|default:"0" }}%</div>
+        <div class="text-muted small">Қайта тесттен кейінгі орташа өсім</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small mb-2">80%-дан асқан студенттер</div>
+        <div class="display-6 fw-bold">{{ passed_80_count|default:"0" }}</div>
+        <div class="text-muted small">Тапсырылған тесттер бойынша мақсатқа жеткендер</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small mb-2">Ең әлсіз тақырып</div>
+        <div class="h4 fw-bold mb-1">{{ top_weak_topic|default:"—" }}</div>
+        <div class="text-muted small">AI analysis бойынша ең көп кездескен weak topic</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small mb-2">Next pass probability</div>
+        <div class="display-6 fw-bold">{{ avg_next_pass_probability|default:"0" }}%</div>
+        <div class="text-muted small">ML бойынша келесі тесттен өту ықтималдығы</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small mb-2">Predicted score</div>
+        <div class="display-6 fw-bold">{{ avg_predicted_score|default:"0" }}%</div>
+        <div class="text-muted small">ML бойынша күтілетін келесі тест нәтижесі</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small mb-2">High-risk students</div>
+        <div class="display-6 fw-bold">{{ high_risk_count|default:"0" }}</div>
+        <div class="text-muted small">
+          {% if high_risk_students %}
+            {{ high_risk_students|join:", " }}
+          {% else %}
+            Қауіпті студенттер жоқ
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h5 class="card-title mb-0">Үлгерім болжамы</h5>
+          <span class="text-muted small">ML prediction</span>
+        </div>
+        <canvas id="perfChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h5 class="card-title mb-0">Тәуекел статусы</h5>
+          <span class="text-muted small">Risk analysis</span>
+        </div>
+        <canvas id="riskChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h5 class="card-title mb-0">Student Progress Chart</h5>
+          <span class="text-muted small">Тест нәтижелерінің динамикасы</span>
+        </div>
+        <canvas id="progressChart" height="100"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h5 class="card-title mb-0">Weak Topics Heatmap</h5>
+          <span class="text-muted small">AI analysis</span>
+        </div>
+        <canvas id="weakTopicsChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h5 class="card-title mb-0">Remedial Improvement Graph</h5>
+          <span class="text-muted small">Before vs After</span>
+        </div>
+        <canvas id="remedialChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h5 class="card-title mb-0">ML Prediction Summary</h5>
+          <span class="text-muted small">Next pass + predicted score</span>
+        </div>
+
+        {% if ml_prediction_rows %}
+          <div class="table-responsive">
+            <table class="table align-middle">
+              <thead>
+                <tr>
+                  <th>Студент</th>
+                  <th class="text-center">Predicted score</th>
+                  <th class="text-center">Pass probability</th>
+                  <th class="text-center">Label</th>
+                  <th class="text-center">Risk</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in ml_prediction_rows %}
+                  <tr>
+                    <td>{{ row.student_name }}</td>
+                    <td class="text-center">{{ row.predicted_score }}%</td>
+                    <td class="text-center">{{ row.pass_probability|floatformat:2 }}%</td>
+                    <td class="text-center">{{ row.label }}</td>
+                    <td class="text-center">
+                      {% if row.risk == "Жоғары тәуекел" %}
+                        <span class="badge text-bg-danger">{{ row.risk }}</span>
+                      {% elif row.risk == "Орташа тәуекел" %}
+                        <span class="badge text-bg-warning">{{ row.risk }}</span>
+                      {% else %}
+                        <span class="badge text-bg-success">{{ row.risk }}</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="text-muted">ML prediction деректері әзірге жоқ.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h5 class="card-title mb-0">AI Analytics Summary</h5>
+          <span class="text-muted small">Жүйенің қорытынды талдауы</span>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-md-4">
+            <div class="p-3 rounded bg-light h-100">
+              <div class="fw-semibold mb-2">Жүйенің негізгі мақсаты</div>
+              <div class="text-muted small">
+                Студенттің тест нәтижесін талдап, әлсіз тақырыптарды анықтап,
+                AI арқылы қайта тест құрып, нәтижені 80%-дан жоғары деңгейге жеткізу.
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="p-3 rounded bg-light h-100">
+              <div class="fw-semibold mb-2">Adaptive learning логикасы</div>
+              <div class="text-muted small">
+                Егер студент 80%-дан төмен нәтиже көрсетсе, жүйе қате кеткен тақырыптарды
+                анықтап, сол тақырыптардан бастапқы параметрлермен сәйкес жаңа remedial тест жасайды.
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="p-3 rounded bg-light h-100">
+              <div class="fw-semibold mb-2">AI + ML артықшылығы</div>
+              <div class="text-muted small">
+                Машиналық оқыту студенттің келесі тест нәтижесін болжайды, тәуекелді анықтайды,
+                ал AI әлсіз тақырыптарға сәйкес adaptivті тест ұсынады.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {% if top_weak_topic and top_weak_topic != "—" %}
+          <div class="alert alert-warning mt-3 mb-0">
+            <b>Назар аудару керек тақырып:</b> {{ top_weak_topic }}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Үлгерім болжамы
+  new Chart(document.getElementById('perfChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Жоғары', 'Орташа', 'Төмен'],
+      datasets: [{
+        data: [
+          {{ perf_counts.Жоғары|default:0 }},
+          {{ perf_counts.Орташа|default:0 }},
+          {{ perf_counts.Төмен|default:0 }}
+        ]
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'bottom' }
+      }
+    }
+  });
+
+  // Тәуекел статусы
+  new Chart(document.getElementById('riskChart'), {
+    type: 'pie',
+    data: {
+      labels: ['Тәуекел', 'Қалыпты'],
+      datasets: [{
+        data: [
+          {{ risk_counts.Тәуекел|default:0 }},
+          {{ risk_counts.Қалыпты|default:0 }}
+        ]
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'bottom' }
+      }
+    }
+  });
+
+  // Student Progress Chart
+  new Chart(document.getElementById('progressChart'), {
+    type: 'line',
+    data: {
+      labels: {{ context_progress_labels|safe }},
+      datasets: [{
+        label: 'Нәтиже (%)',
+        data: {{ context_progress_values|safe }},
+        fill: false,
+        tension: 0.25
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: true }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          suggestedMax: 100
+        }
+      }
+    }
+  });
+
+  // Weak Topics Heatmap
+  new Chart(document.getElementById('weakTopicsChart'), {
+    type: 'bar',
+    data: {
+      labels: {{ context_weak_topic_labels|safe }},
+      datasets: [{
+        label: 'Қайталану саны',
+        data: {{ context_weak_topic_values|safe }}
+      }]
+    },
+    options: {
+      responsive: true,
+      indexAxis: 'y',
+      plugins: {
+        legend: { display: true }
+      },
+      scales: {
+        x: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+
+  // Remedial Improvement Graph
+  new Chart(document.getElementById('remedialChart'), {
+    type: 'bar',
+    data: {
+      labels: {{ context_remedial_labels|safe }},
+      datasets: [
+        {
+          label: 'Бастапқы нәтиже',
+          data: {{ context_remedial_before|safe }}
+        },
+        {
+          label: 'Соңғы нәтиже',
+          data: {{ context_remedial_after|safe }}
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'bottom' }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          suggestedMax: 100
+        }
+      }
+    }
+  });
+</script>
+{% endblock %}

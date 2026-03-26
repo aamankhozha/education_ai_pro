@@ -1,0 +1,235 @@
+{% extends "students/base.html" %}
+{% block title %}{{ student.name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+  <div>
+    <h3 class="mb-0">{{ student.name }}</h3>
+    <div class="text-muted">Студенттің жеке аналитикасы</div>
+  </div>
+  <a href="{% url 'student_group_detail' student.group %}" class="btn btn-outline-secondary">Артқа</a>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small">Топ</div>
+        <div class="h4 fw-bold mb-0">{{ student.group|default:"—" }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small">Орташа нәтиже</div>
+        <div class="h4 fw-bold mb-0">{{ avg_percent }}%</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small">Барлық тест</div>
+        <div class="h4 fw-bold mb-0">{{ total_tests }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small">80%-дан асқан</div>
+        <div class="h4 fw-bold mb-0">{{ passed_tests }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body">
+        <h5 class="card-title">Тест нәтижелерінің динамикасы</h5>
+        <canvas id="progressChart"></canvas>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body">
+        <h5 class="card-title">Тест тарихы</h5>
+
+        {% if submissions %}
+          <div class="table-responsive">
+            <table class="table align-middle">
+              <thead>
+                <tr>
+                  <th>Тест</th>
+                  <th class="text-center">Түрі</th>
+                  <th class="text-center">Нәтиже</th>
+                  <th class="text-center">Күйі</th>
+                  <th class="text-end">Уақыты</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for sub in submissions %}
+                  <tr>
+                    <td>{{ sub.quiz.title }}</td>
+                    <td class="text-center">
+                      {% if sub.quiz.quiz_type == "remedial" %}
+                        <span class="badge text-bg-warning">Remedial</span>
+                      {% elif sub.quiz.quiz_type == "ai" %}
+                        <span class="badge text-bg-primary">AI</span>
+                      {% else %}
+                        <span class="badge text-bg-secondary">Manual</span>
+                      {% endif %}
+                    </td>
+                    <td class="text-center">{{ sub.percent }}%</td>
+                    <td class="text-center">
+                      {% if sub.percent >= 80 %}
+                        <span class="badge text-bg-success">Passed</span>
+                      {% else %}
+                        <span class="badge text-bg-danger">Below 80%</span>
+                      {% endif %}
+                    </td>
+                    <td class="text-end">{{ sub.submitted_at|date:"d.m.Y H:i" }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="text-muted">Тест нәтижелері әзірге жоқ.</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Intervention recommendations</h5>
+
+        {% if interventions %}
+          <div class="list-group list-group-flush">
+            {% for item in interventions %}
+              <div class="list-group-item px-0">
+                <div class="d-flex align-items-start gap-2">
+                  <span class="badge text-bg-info mt-1">AI/ML</span>
+                  <div>{{ item }}</div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-muted">Қосымша intervention recommendation жоқ.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body">
+        <h5 class="card-title">Weak Topics</h5>
+        <canvas id="weakTopicsChart"></canvas>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body">
+        <h5 class="card-title">ML Summary</h5>
+
+        {% if ml_summary %}
+          <div class="mb-3">
+            <div class="text-muted small">Predicted score</div>
+            <div class="h4 fw-bold mb-0">{{ ml_summary.predicted_score }}%</div>
+          </div>
+
+          <div class="mb-3">
+            <div class="text-muted small">Pass probability</div>
+            <div class="h4 fw-bold mb-0">{{ ml_summary.pass_probability|floatformat:2 }}</div>
+          </div>
+
+          <div class="mb-3">
+            <div class="text-muted small">Predicted label</div>
+            <div class="fw-semibold">{{ ml_summary.label }}</div>
+          </div>
+
+          <div class="mb-0">
+            <div class="text-muted small">Risk</div>
+            {% if ml_summary.risk == "Жоғары тәуекел" %}
+              <span class="badge text-bg-danger">{{ ml_summary.risk }}</span>
+            {% elif ml_summary.risk == "Орташа тәуекел" %}
+              <span class="badge text-bg-warning">{{ ml_summary.risk }}</span>
+            {% else %}
+              <span class="badge text-bg-success">{{ ml_summary.risk }}</span>
+            {% endif %}
+          </div>
+        {% else %}
+          <div class="text-muted">ML summary әзірге қолжетімсіз.</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Соңғы AI анализдер</h5>
+        {% if analyses %}
+          <ul class="list-group list-group-flush">
+            {% for a in analyses %}
+              <li class="list-group-item px-0">
+                <div class="fw-semibold">{{ a.quiz.title }}</div>
+                <div class="text-muted small">{{ a.percent }}%</div>
+                <div class="text-muted small">{{ a.created_at|date:"d.m.Y H:i" }}</div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="text-muted">AI analysis әзірге жоқ.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  new Chart(document.getElementById('progressChart'), {
+    type: 'line',
+    data: {
+      labels: {{ progress_labels|safe }},
+      datasets: [{
+        label: 'Нәтиже (%)',
+        data: {{ progress_values|safe }},
+        tension: 0.25
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true,
+          suggestedMax: 100
+        }
+      }
+    }
+  });
+
+  new Chart(document.getElementById('weakTopicsChart'), {
+    type: 'bar',
+    data: {
+      labels: {{ weak_topic_labels|safe }},
+      datasets: [{
+        label: 'Қайталану саны',
+        data: {{ weak_topic_values|safe }}
+      }]
+    },
+    options: {
+      responsive: true,
+      indexAxis: 'y'
+    }
+  });
+</script>
+{% endblock %}

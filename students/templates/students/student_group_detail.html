@@ -1,0 +1,79 @@
+{% extends "students/base.html" %}
+{% block title %}{{ group_name }} тобы{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+  <div>
+    <h3 class="mb-0">{{ group_name }} тобы</h3>
+    <div class="text-muted">Топ студенттері және олардың жеке аналитикасына өту</div>
+  </div>
+  <a href="{% url 'student_list' %}" class="btn btn-outline-secondary">Топтарға оралу</a>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small">Топтың орташа тест нәтижесі</div>
+        <div class="display-6 fw-bold">{{ avg_percent }}%</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small">Топ бойынша жалпы тест саны</div>
+        <div class="display-6 fw-bold">{{ total_tests }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    {% if students %}
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>Студент</th>
+              <th>Логин</th>
+              <th class="text-center">Платформа доступы</th>
+              <th class="text-end">Әрекет</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in students %}
+              <tr>
+                <td>{{ s.name }}</td>
+                <td>
+                  {% if s.user %}
+                    {{ s.user.username }}
+                  {% else %}
+                    —
+                  {% endif %}
+                </td>
+                <td class="text-center">
+                  {% if s.can_access_platform %}
+                    <span class="badge text-bg-success">Иә</span>
+                  {% else %}
+                    <span class="badge text-bg-secondary">Жоқ</span>
+                  {% endif %}
+                </td>
+                <td class="text-end">
+                  <a href="{% url 'student_detail_dashboard' s.id %}" class="btn btn-sm btn-primary">
+                    Қарау
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="text-muted">Бұл топта доступ берілген студенттер жоқ.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

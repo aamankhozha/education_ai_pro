@@ -1,0 +1,45 @@
+{% extends "students/base.html" %}
+{% block title %}Студент қосу{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <h3 class="mb-0">Студент қосу</h3>
+  <div class="text-muted">Жаңа студентке логин ашу және платформа доступын беру</div>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="mb-3">
+        <label class="form-label">Студент аты-жөні</label>
+        {{ form.name }}
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Тобы</label>
+        {{ form.group }}
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Логин</label>
+        {{ form.username }}
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Құпиясөз</label>
+        {{ form.password }}
+      </div>
+
+      <div class="form-check mb-3">
+        {{ form.can_access_platform }}
+        <label class="form-check-label">Платформаға доступ беру</label>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Сақтау</button>
+      <a href="{% url 'student_access_manage' %}" class="btn btn-outline-secondary">Артқа</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "students/base.html" %}
+{% block title %}Тесттер (студент){% endblock %}
+
+{% block content %}
+<div class="mb-3">
+  <h3 class="mb-0">Тесттер</h3>
+  <div class="text-muted">Белсенді тесттер. Әр тест 1 рет тапсырылады.</div>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    {% if quizzes %}
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>Тест</th>
+              <th class="text-center">Сұрақ</th>
+              <th class="text-center">Уақыт</th>
+              <th class="text-end">Әрекет</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for q in quizzes %}
+              <tr>
+                <td>
+                  <div class="fw-semibold">{{ q.title }}</div>
+                  <div class="text-muted small">{{ q.description|default:"" }}</div>
+                </td>
+                <td class="text-center">{{ q.questions.count }}</td>
+                <td class="text-center">{{ q.time_limit_minutes }} мин</td>
+                <td class="text-end">
+                  {% if q.id in taken_ids %}
+                    <span class="badge text-bg-success">Тапсырылған</span>
+                  {% else %}
+                    <a class="btn btn-sm btn-primary" href="{% url 'quiz_take' q.id %}">Өту</a>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="text-muted">Белсенді тест жоқ.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

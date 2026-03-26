@@ -1,0 +1,69 @@
+{% extends "students/base.html" %}
+{% block title %}Тесттер (оқытушы){% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <div>
+    <h3 class="mb-0">Тесттер</h3>
+    <div class="text-muted">Оқытушы панелі: тест құру, өңдеу, нәтижелер</div>
+  </div>
+
+  {# 🔥 МЫНАНЫ ҚОСТЫМ — AI + Қолмен тест #}
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-primary" href="{% url 'quiz_ai_create' %}">
+      🤖 AI тест
+    </a>
+    <a class="btn btn-primary" href="{% url 'quiz_create' %}">
+      + Жаңа тест
+    </a>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    {% if quizzes %}
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>Атауы</th>
+              <th class="text-center">Сұрақ саны</th>
+              <th class="text-center">Актив</th>
+              <th class="text-center">Уақыт (мин)</th>
+              <th class="text-end">Әрекет</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for q in quizzes %}
+              <tr>
+                <td>
+                  <div class="fw-semibold">{{ q.title }}</div>
+                  <div class="text-muted small">{{ q.description|default:"" }}</div>
+                  <div class="text-muted small">Құрылған: {{ q.created_at|date:"d.m.Y H:i" }}</div>
+                </td>
+                <td class="text-center">
+                  <span class="badge text-bg-light">{{ q.questions.count }}</span>
+                </td>
+                <td class="text-center">
+                  {% if q.is_active %}
+                    <span class="badge text-bg-success">Иә</span>
+                  {% else %}
+                    <span class="badge text-bg-secondary">Жоқ</span>
+                  {% endif %}
+                </td>
+                <td class="text-center">{{ q.time_limit_minutes }}</td>
+                <td class="text-end">
+                  <a class="btn btn-sm btn-outline-primary" href="{% url 'quiz_edit' q.id %}">Өңдеу</a>
+                  <a class="btn btn-sm btn-outline-dark" href="{% url 'quiz_results' q.id %}">Нәтиже</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="text-muted">Әзірге тест жоқ. “Жаңа тест” батырмасымен қосыңыз.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

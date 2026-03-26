@@ -1,0 +1,35 @@
+{% extends "students/base.html" %}
+{% block title %}Жауап варианты{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+  <h3 class="mb-0">Жауап варианты қосу</h3>
+  <div class="text-muted">Сұрақ: {{ question.text }}</div>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label">Жауап мәтіні</label>
+        {{ form.text }}
+      </div>
+
+      <div class="form-check mb-3">
+        {{ form.is_correct }}
+        <label class="form-check-label">Бұл дұрыс жауап па?</label>
+      </div>
+
+      <div class="alert alert-warning small mb-3">
+        Бір сұрақта <b>бір ғана</b> дұрыс жауап белгіленуі керек.
+      </div>
+
+      <div class="d-flex gap-2">
+        <button class="btn btn-success" type="submit">Қосу</button>
+        <a class="btn btn-outline-secondary" href="{% url 'quiz_edit' question.quiz.id %}">Артқа</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

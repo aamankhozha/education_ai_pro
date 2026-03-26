@@ -1,0 +1,35 @@
+{% extends "students/base.html" %}
+{% block title %}Мұғалім қосу{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <h3 class="mb-0">Мұғалім қосу</h3>
+  <div class="text-muted">Жаңа мұғалімге платформа аккаунтын ашу</div>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="mb-3">
+        <label class="form-label">Мұғалім аты-жөні</label>
+        {{ form.full_name }}
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Логин</label>
+        {{ form.username }}
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Құпиясөз</label>
+        {{ form.password }}
+      </div>
+
+      <button type="submit" class="btn btn-primary">Сақтау</button>
+      <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-secondary">Артқа</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

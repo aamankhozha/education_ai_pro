@@ -1,0 +1,51 @@
+{% extends "students/base.html" %}
+{% block title %}Материалдар{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <div>
+    <h3 class="mb-0">Материалдар</h3>
+    <div class="text-muted">PDF немесе Word файлдарын жүктеп, солардан AI тест жасау</div>
+  </div>
+  <a class="btn btn-primary" href="{% url 'material_upload' %}">+ Материал жүктеу</a>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    {% if materials %}
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>Атауы</th>
+              <th class="text-center">Пән</th>
+              <th class="text-center">Тақырып</th>
+              <th class="text-end">Әрекет</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for m in materials %}
+              <tr>
+                <td>
+                  <div class="fw-semibold">{{ m.title }}</div>
+                  <div class="text-muted small">Жүктелген: {{ m.created_at|date:"d.m.Y H:i" }}</div>
+                </td>
+                <td class="text-center">{{ m.subject|default:"-" }}</td>
+                <td class="text-center">{{ m.topic|default:"-" }}</td>
+                <td class="text-end">
+                  <a class="btn btn-sm btn-outline-dark" href="{{ m.file.url }}" target="_blank">Файл</a>
+                  <a class="btn btn-sm btn-outline-primary" href="{% url 'ai_quiz_from_material' m.id %}">
+                    AI тест
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="text-muted">Әзірге материал жоқ.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends "students/base.html" %}
+{% block title %}Админ панелі{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <h3 class="mb-0">Админ панелі</h3>
+  <div class="text-muted">Мұғалімдер мен студенттерге платформаға доступ беру бөлімі</div>
+</div>
+
+<div class="row g-4">
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small">Мұғалімдер саны</div>
+        <div class="display-6 fw-bold">{{ teacher_count }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small">Студенттер саны</div>
+        <div class="display-6 fw-bold">{{ student_count }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small">Доступ берілген студенттер</div>
+        <div class="display-6 fw-bold">{{ active_student_count }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mt-2">
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <h5 class="card-title">Мұғалім аккаунты</h5>
+        <p class="text-muted">Жаңа мұғалім қосу және платформаға кіру аккаунтын ашу.</p>
+        <a href="{% url 'teacher_create' %}" class="btn btn-primary">Мұғалім қосу</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <h5 class="card-title">Студент аккаунты</h5>
+        <p class="text-muted">Жаңа студент қосу және платформа доступын басқару.</p>
+        <div class="d-flex gap-2">
+          <a href="{% url 'student_onboard_create' %}" class="btn btn-primary">Студент қосу</a>
+          <a href="{% url 'student_access_manage' %}" class="btn btn-outline-secondary">Доступтарды қарау</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

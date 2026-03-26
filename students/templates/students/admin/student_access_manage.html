@@ -1,0 +1,65 @@
+{% extends "students/base.html" %}
+{% block title %}Студент доступы{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+  <div>
+    <h3 class="mb-0">Студент доступын басқару</h3>
+    <div class="text-muted">Платформаға кіру рұқсатын қосу немесе өшіру</div>
+  </div>
+  <a href="{% url 'student_onboard_create' %}" class="btn btn-primary">+ Студент қосу</a>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    {% if students %}
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>Студент</th>
+              <th>Тобы</th>
+              <th>Логин</th>
+              <th class="text-center">Доступ</th>
+              <th class="text-end">Әрекет</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in students %}
+              <tr>
+                <td>{{ s.name }}</td>
+                <td>{{ s.group|default:"—" }}</td>
+                <td>
+                  {% if s.user %}
+                    {{ s.user.username }}
+                  {% else %}
+                    —
+                  {% endif %}
+                </td>
+                <td class="text-center">
+                  {% if s.can_access_platform %}
+                    <span class="badge text-bg-success">Қосулы</span>
+                  {% else %}
+                    <span class="badge text-bg-secondary">Өшірулі</span>
+                  {% endif %}
+                </td>
+                <td class="text-end">
+                  <a href="{% url 'student_toggle_access' s.id %}" class="btn btn-sm btn-outline-primary">
+                    {% if s.can_access_platform %}
+                      Доступты өшіру
+                    {% else %}
+                      Доступ беру
+                    {% endif %}
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="text-muted">Әзірге студенттер жоқ.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "students/base.html" %}
+{% block title %}Материалдан AI тест{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <div>
+    <h3 class="mb-0">Материалдан AI тест жасау</h3>
+    <div class="text-muted">PDF немесе Word файлдан сұрақтар генерациялау</div>
+  </div>
+  <a class="btn btn-outline-secondary" href="{% url 'material_list' %}">Артқа</a>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    <div class="mb-3">
+      <div class="fw-semibold">{{ material.title }}</div>
+      <div class="text-muted small">Пән: {{ material.subject }}</div>
+      <div class="text-muted small">Тақырып: {{ material.topic }}</div>
+      <div class="text-muted small">Файл: <a href="{{ material.file.url }}" target="_blank">ашу</a></div>
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Сұрақ саны</label>
+          <input type="number" name="num_questions" class="form-control" value="10" min="1" max="50">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Уақыт (мин)</label>
+          <input type="number" name="time_limit_minutes" class="form-control" value="20" min="1" max="180">
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <button type="submit" class="btn btn-primary">AI тест жасау</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

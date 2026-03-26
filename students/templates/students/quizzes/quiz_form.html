@@ -1,0 +1,44 @@
+{% extends "students/base.html" %}
+{% block title %}Тест құру{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+  <h3 class="mb-0">Тест құру</h3>
+  <div class="text-muted">Алдымен тесттің атын/параметрлерін қойыңыз, кейін сұрақ қосасыз.</div>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+
+      <div class="mb-3">
+        <label class="form-label">Атауы</label>
+        {{ form.title }}
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Сипаттама</label>
+        {{ form.description }}
+      </div>
+
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">Актив</label>
+          {{ form.is_active }}
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Уақыт лимиті (мин)</label>
+          {{ form.time_limit_minutes }}
+        </div>
+      </div>
+
+      <div class="mt-4 d-flex gap-2">
+        <button class="btn btn-primary" type="submit">Сақтау</button>
+        <a class="btn btn-outline-secondary" href="{% url 'quiz_list_teacher' %}">Артқа</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

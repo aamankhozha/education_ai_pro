@@ -1,0 +1,153 @@
+{% load static %}
+<!doctype html>
+<html lang="kk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Education AI{% endblock %}</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body class="bg-light">
+  <div class="container-fluid">
+    <div class="row min-vh-100">
+      <aside class="col-md-3 col-lg-2 bg-white sidebar border-end">
+        <div class="p-3 border-bottom d-flex align-items-center gap-2">
+          <div class="logo-dot"></div>
+          <div>
+            <div class="fw-bold">Education AI</div>
+            <div class="text-muted small">Дипломдық жоба</div>
+          </div>
+        </div>
+
+        <div class="p-3">
+          <div class="small text-muted mb-2">Навигация</div>
+          <div class="nav nav-pills flex-column gap-1">
+
+            {# Admin menu #}
+            {% if is_admin %}
+              <a class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}"
+                 href="{% url 'admin_dashboard' %}">
+                Админ панелі
+              </a>
+
+              <a class="nav-link {% if request.resolver_match.url_name == 'teacher_create' %}active{% endif %}"
+                 href="{% url 'teacher_create' %}">
+                Мұғалім қосу
+              </a>
+
+              <a class="nav-link {% if request.resolver_match.url_name == 'student_onboard_create' %}active{% endif %}"
+                 href="{% url 'student_onboard_create' %}">
+                Студент қосу
+              </a>
+
+              <a class="nav-link {% if request.resolver_match.url_name == 'student_access_manage' %}active{% endif %}"
+                 href="{% url 'student_access_manage' %}">
+                Студент доступы
+              </a>
+            {% endif %}
+
+            {# Teacher menu #}
+            {% if is_teacher %}
+              <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+                 href="{% url 'dashboard' %}">
+                Дашборд
+              </a>
+
+              <a class="nav-link {% if request.resolver_match.url_name == 'student_list' or request.resolver_match.url_name == 'student_group_detail' or request.resolver_match.url_name == 'student_detail_dashboard' %}active{% endif %}"
+                 href="{% url 'student_list' %}">
+                Топтар
+              </a>
+
+              <a class="nav-link {% if request.resolver_match.url_name == 'analytics' %}active{% endif %}"
+                 href="{% url 'analytics' %}">
+                Аналитика
+              </a>
+
+              <a class="nav-link {% if request.resolver_match.url_name == 'quiz_list_teacher' or request.resolver_match.url_name == 'quiz_create' or request.resolver_match.url_name == 'quiz_edit' or request.resolver_match.url_name == 'quiz_ai_create' or request.resolver_match.url_name == 'quiz_results' %}active{% endif %}"
+                 href="{% url 'quiz_list_teacher' %}">
+                Тесттер
+              </a>
+
+              <a class="nav-link {% if request.resolver_match.url_name == 'material_list' or request.resolver_match.url_name == 'material_upload' or request.resolver_match.url_name == 'ai_quiz_from_material' %}active{% endif %}"
+                 href="{% url 'material_list' %}">
+                Материалдар
+              </a>
+            {% endif %}
+
+            {# Student menu #}
+            {% if is_student %}
+              <a class="nav-link {% if request.resolver_match.url_name == 'student_dashboard' %}active{% endif %}"
+                 href="{% url 'student_dashboard' %}">
+                Менің кабинетім
+              </a>
+
+              <a class="nav-link {% if request.resolver_match.url_name == 'quiz_list_student' or request.resolver_match.url_name == 'quiz_take' %}active{% endif %}"
+                 href="{% url 'quiz_list_student' %}">
+                Тесттер
+              </a>
+            {% endif %}
+          </div>
+
+          <hr>
+
+          <div class="small text-muted mb-2">Аккаунт</div>
+          <div class="d-flex align-items-center justify-content-between">
+            <div class="small">
+              <div class="fw-semibold">{{ request.user.username }}</div>
+
+              <div class="text-muted">
+                {% if is_admin %}
+                  Админ
+                {% elif is_teacher %}
+                  Мұғалім
+                {% elif is_student %}
+                  Студент
+                {% else %}
+                  Пайдаланушы
+                {% endif %}
+              </div>
+            </div>
+
+            <a class="btn btn-sm btn-outline-secondary" href="{% url 'logout' %}">
+              Шығу
+            </a>
+          </div>
+
+          <hr>
+
+          <div class="small text-muted mb-2">ML болжам моделі</div>
+          <div class="small">
+            {% if model_ready %}
+              <span class="badge text-bg-success">ML модель дайын</span>
+            {% else %}
+              <span class="badge text-bg-warning">ML модель оқытылмаған</span>
+              <div class="text-muted mt-2" style="font-size:12px;">
+                Оқыту: <code>python ml_models/train_models.py</code>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </aside>
+
+      <main class="col-md-9 col-lg-10 p-4">
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} shadow-sm">
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

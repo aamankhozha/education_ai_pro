@@ -1,0 +1,57 @@
+{% extends "students/base.html" %}
+{% block title %}Топтар{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+  <div>
+    <h3 class="mb-0">Топтар</h3>
+    <div class="text-muted">Платформаға доступ берілген студенттер бойынша топтар тізімі</div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small">Топ саны</div>
+        <div class="display-6 fw-bold">{{ total_groups }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small">Доступ берілген студенттер</div>
+        <div class="display-6 fw-bold">{{ total_students }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  {% if groups %}
+    {% for g in groups %}
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title mb-2">{{ g.group }}</h5>
+            <div class="text-muted mb-3">Студент саны: {{ g.student_count }}</div>
+
+            <div class="mt-auto">
+              <a href="{% url 'student_group_detail' g.group %}" class="btn btn-primary">
+                Топты ашу
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="col-12">
+      <div class="alert alert-light border">
+        Платформаға доступ берілген топтар әзірге жоқ.
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

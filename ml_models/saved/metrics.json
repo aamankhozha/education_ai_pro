@@ -1,0 +1,10 @@
+{
+  "train_date": "2026-03-02 16:32",
+  "accuracy_by_model": {
+    "RandomForest": 1.0,
+    "LogisticRegression": 1.0,
+    "TensorFlow": 0.6667
+  },
+  "best_model": "RandomForest",
+  "best_accuracy": 1.0
+}

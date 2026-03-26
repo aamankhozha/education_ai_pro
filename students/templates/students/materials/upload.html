@@ -1,0 +1,44 @@
+{% extends "students/base.html" %}
+{% block title %}Материал жүктеу{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+  <h3 class="mb-0">Материал жүктеу</h3>
+  <div class="text-muted">PDF немесе Word (.docx) файл жүктеп, содан AI тест жасауға болады</div>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Материал атауы</label>
+          {{ form.title }}
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">Пән</label>
+          {{ form.subject }}
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">Тақырып</label>
+          {{ form.topic }}
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Файл (PDF немесе DOCX)</label>
+          {{ form.file }}
+        </div>
+      </div>
+
+      <div class="mt-4 d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Жүктеу</button>
+        <a href="{% url 'material_list' %}" class="btn btn-outline-secondary">Артқа</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

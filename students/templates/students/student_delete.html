@@ -1,0 +1,15 @@
+{% extends "students/base.html" %}
+{% block title %}Жою{% endblock %}
+{% block content %}
+  <h3>Жою</h3>
+  <div class="card border-0 shadow-sm">
+    <div class="card-body">
+      <p><span class="fw-semibold">{{ student.name }}</span> студентін жойғыңыз келе ме?</p>
+      <form method="post">
+        {% csrf_token %}
+        <button class="btn btn-danger">Иә, жою</button>
+        <a class="btn btn-outline-secondary" href="{% url 'student_list' %}">Жоқ</a>
+      </form>
+    </div>
+  </div>
+{% endblock %}

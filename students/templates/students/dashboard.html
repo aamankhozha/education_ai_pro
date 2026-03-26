@@ -1,0 +1,121 @@
+{% extends "students/base.html" %}
+{% block title %}Дашборд{% endblock %}
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h3 class="mb-0">Дашборд</h3>
+      <div class="text-muted">Білім сапасын талдау жүйесі</div>
+    </div>
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-primary" href="{% url 'student_add' %}">+ Студент қосу</a>
+      <a class="btn btn-primary {% if not model_ready %}disabled{% endif %}" href="{% url 'predict_all' %}">Барлығын болжау</a>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="card kpi-card">
+        <div class="card-body">
+          <div class="text-muted">Студент саны</div>
+          <div class="display-6 fw-bold">{{ total_students }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card kpi-card">
+        <div class="card-body">
+          <div class="text-muted">Орташа қатысу (%)</div>
+          <div class="display-6 fw-bold">{{ avg_attendance }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card kpi-card">
+        <div class="card-body">
+          <div class="text-muted">Тәуекел (%)</div>
+          <div class="display-6 fw-bold">{{ risk_percent }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mt-1">
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="fw-semibold">Болжам үлестірімі</div>
+            <span class="text-muted small">Predicted performance</span>
+          </div>
+          <canvas id="perfChart" height="140"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="fw-semibold">Модель сапасы (соңғы оқыту)</div>
+            <span class="text-muted small">RF vs LR vs TF</span>
+          </div>
+          {% if metrics %}
+            <div class="row mt-3 g-2">
+              <div class="col-4">
+                <div class="p-3 bg-light rounded">
+                  <div class="text-muted small">Best model</div>
+                  <div class="fw-bold">{{ metrics.best_model }}</div>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="p-3 bg-light rounded">
+                  <div class="text-muted small">Best accuracy</div>
+                  <div class="fw-bold">{{ metrics.best_accuracy }}</div>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="p-3 bg-light rounded">
+                  <div class="text-muted small">Train date</div>
+                  <div class="fw-bold">{{ metrics.train_date }}</div>
+                </div>
+              </div>
+            </div>
+            <canvas id="accChart" height="140" class="mt-3"></canvas>
+          {% else %}
+            <div class="text-muted mt-3">Оқыту метрикалары жоқ. <code>python ml_models/train_models.py</code></div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const perfData = {{ pred_counts|safe }};
+  const perfCtx = document.getElementById('perfChart');
+  new Chart(perfCtx, {
+    type: 'doughnut',
+    data: {
+      labels: Object.keys(perfData),
+      datasets: [{ data: Object.values(perfData) }]
+    },
+    options: { plugins: { legend: { position: 'bottom' } } }
+  });
+
+  const metrics = {{ metrics|default:"{}"|safe }};
+  if (metrics && metrics.accuracy_by_model) {
+    const accCtx = document.getElementById('accChart');
+    const labels = Object.keys(metrics.accuracy_by_model);
+    const values = Object.values(metrics.accuracy_by_model);
+    new Chart(accCtx, {
+      type: 'bar',
+      data: { labels, datasets: [{ label: 'Accuracy', data: values }] },
+      options: {
+        scales: { y: { beginAtZero: true, max: 1 } },
+        plugins: { legend: { display: false } }
+      }
+    });
+  }
+</script>
+{% endblock %}

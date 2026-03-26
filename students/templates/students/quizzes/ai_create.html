@@ -1,0 +1,40 @@
+{% extends "students/base.html" %}
+{% block title %}AI тест генерация{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+  <h3 class="mb-0">AI арқылы тест құру</h3>
+  <div class="text-muted">Пән, тақырып, сұрақ саны және уақытты беріңіз — жүйе тест дайындайды.</div>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Пән</label>
+          {{ form.subject }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Тақырып</label>
+          {{ form.topic }}
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Сұрақ саны</label>
+          {{ form.num_questions }}
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Уақыт (мин)</label>
+          {{ form.time_limit_minutes }}
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <button class="btn btn-primary" type="submit">AI тест жасау</button>
+        <a class="btn btn-outline-secondary" href="{% url 'quiz_list_teacher' %}">Артқа</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
